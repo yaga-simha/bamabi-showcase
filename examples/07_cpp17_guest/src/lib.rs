@@ -620,7 +620,7 @@ fn find_cxx_compiler() -> String {
         return cxx.trim().to_owned();
     }
     #[cfg(target_os = "windows")]
-    let candidates = ["clang++", "clang-cl", "cl.exe", "cl", "g++", "c++"];
+    let candidates = ["cl.exe", "cl", "clang-cl", "g++", "clang++", "c++"];
     #[cfg(not(target_os = "windows"))]
     let candidates = ["clang++", "g++", "c++"];
     for cand in candidates {

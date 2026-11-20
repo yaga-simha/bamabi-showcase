@@ -169,7 +169,7 @@ fn ensure_asymmetric_c_mod_dylib() -> (PathBuf, &'static str) {
     let candidates: Vec<std::ffi::OsString> = if let Some(cc) = std::env::var_os("CC") {
         vec![cc]
     } else if cfg!(windows) {
-        ["clang", "clang-cl", "cl.exe", "cl", "gcc", "cc"]
+        ["cl.exe", "cl", "clang-cl", "gcc", "clang", "cc"]
             .into_iter()
             .map(Into::into)
             .collect()

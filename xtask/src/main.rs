@@ -410,7 +410,7 @@ pub(crate) fn c_compiler() -> String {
         return cc.trim().to_owned();
     }
     #[cfg(target_os = "windows")]
-    let defaults = ["clang", "clang-cl", "cl.exe", "cl", "gcc", "cc"];
+    let defaults = ["cl.exe", "cl", "clang-cl", "gcc", "clang", "cc"];
     #[cfg(not(target_os = "windows"))]
     let defaults = ["clang", "gcc", "cc"];
     defaults
@@ -432,7 +432,7 @@ pub(crate) fn cxx_compiler() -> String {
         return cxx.trim().to_owned();
     }
     #[cfg(target_os = "windows")]
-    let defaults = ["clang++", "clang-cl", "cl.exe", "cl", "g++", "c++"];
+    let defaults = ["cl.exe", "cl", "clang-cl", "g++", "clang++", "c++"];
     #[cfg(not(target_os = "windows"))]
     let defaults = ["clang++", "g++", "c++"];
     defaults
@@ -2114,12 +2114,17 @@ fn cmd_miri(args: &[String]) -> Result<(), String> {
 }
 
 fn verify_headless_host_isolation(root: &Path) -> Result<(), String> {
+    let Some(core) = core_root(root)? else {
+        println!(
+            "==> [standalone] Skipping sibling headless `bamabi_host` isolation check (`bamabi-core` not present; showcase examples unify `bridge-reflect`)"
+        );
+        return Ok(());
+    };
     println!(
         "==> Checking headless `bamabi_host` has zero render/reflect/scene/asset/notify dependencies"
     );
-    let check_dir = core_root(root)?.unwrap_or_else(|| root.to_path_buf());
     let output = Command::new(cargo_bin())
-        .current_dir(&check_dir)
+        .current_dir(&core)
         .args([
             "tree",
             "-p",

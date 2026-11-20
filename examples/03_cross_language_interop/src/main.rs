@@ -273,7 +273,7 @@ fn find_c_compiler() -> String {
         return cc.trim().to_owned();
     }
     #[cfg(target_os = "windows")]
-    let candidates = ["clang", "clang-cl", "cl.exe", "cl", "gcc", "cc"];
+    let candidates = ["cl.exe", "cl", "clang-cl", "gcc", "clang", "cc"];
     #[cfg(not(target_os = "windows"))]
     let candidates = ["clang", "gcc", "cc"];
     for cand in candidates {
