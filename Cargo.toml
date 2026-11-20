@@ -1,0 +1,82 @@
+[workspace]
+resolver = "2"
+members = [
+    "xtask",
+    "benches/coupled_rust_mod",
+    "benches/permutation_bench",
+    "examples/01_minimal_handshake",
+    "examples/02_multi_system_pipeline",
+    "examples/03_cross_language_interop",
+    "examples/04_visual_game",
+    "examples/05_cute_3d_winit",
+    "examples/06_cross_mod_components",
+    "examples/07_cpp17_guest",
+    "examples/08_zig_guest",
+    "examples/09_bql_wire_parity",
+    "examples/10_bevy20_full_companion",
+]
+default-members = [
+    "xtask",
+    "examples/01_minimal_handshake",
+    "examples/02_multi_system_pipeline",
+    "examples/03_cross_language_interop",
+    "examples/06_cross_mod_components",
+    "examples/07_cpp17_guest",
+    "examples/09_bql_wire_parity",
+    "examples/10_bevy20_full_companion",
+]
+exclude = [
+    "benches/shared_scenario",
+    "benches/c_abi_rust_mod",
+    "benches/deterministic_gate",
+    "fuzz",
+    "examples/01_minimal_handshake/guest_mod",
+    "examples/02_multi_system_pipeline/guest_mod",
+    "examples/03_cross_language_interop/rust_mod",
+    "examples/04_visual_game/mods/mod_gravity",
+    "examples/04_visual_game/mods/mod_rainbow",
+    "examples/04_visual_game/mods/mod_vortex",
+    "examples/05_cute_3d_winit/mods/mod_boing",
+    "examples/05_cute_3d_winit/mods/mod_carousel",
+    "examples/06_cross_mod_components/mods/mod_shield_emitter",
+    "examples/06_cross_mod_components/mods/mod_overcharge_siphon",
+    "examples/09_bql_wire_parity/rust_mod",
+    "examples/10_bevy20_full_companion/guest_mod",
+]
+
+[workspace.package]
+version = "0.3.0"
+edition = "2024"
+rust-version = "1.95"
+license = "MIT OR Apache-2.0"
+authors = ["bamabi authors"]
+repository = "https://github.com/yaga-simha/bamabi-showcase"
+keywords = ["bevy", "ecs", "ffi", "modding", "plugin"]
+categories = ["game-development", "api-bindings"]
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+improper_ctypes_definitions = "deny"
+unreachable_pub = "warn"
+
+[workspace.lints.clippy]
+undocumented_unsafe_blocks = "warn"
+ptr_as_ptr = "warn"
+cast_ptr_alignment = "warn"
+transmute_ptr_to_ptr = "warn"
+needless_pass_by_ref_mut = "warn"
+redundant_clone = "warn"
+match_same_arms = "warn"
+
+[workspace.dependencies]
+bamabi_sys = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-wire.git", branch = "main" }
+bamabi_macros = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-wire.git", branch = "main" }
+bamabi_sdk_gen = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-wire.git", branch = "main" }
+bamabi_trust = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-tools.git", branch = "main" }
+bamabi_manifest = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-tools.git", branch = "main" }
+bamabi_host_sys = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-core.git", branch = "main" }
+bamabi_host = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-core.git", branch = "main" }
+bamabi = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi.git", branch = "main" }
+bevy_ecs = { version = "0.20.1", default-features = false, features = ["std", "async_executor"] }
+bevy_app = { version = "0.20.1", default-features = false, features = ["std"] }
+libloading = "0.8"

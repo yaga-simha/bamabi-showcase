@@ -1,0 +1,24 @@
+[package]
+name = "xtask"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+publish = false
+
+[dependencies]
+bamabi_macros = { workspace = true }
+bamabi_manifest = { workspace = true }
+bamabi_sdk_gen = { workspace = true }
+bamabi_sys = { workspace = true }
+bamabi_trust = { workspace = true, features = ["keygen"] }
+
+[dev-dependencies]
+bamabi_host = { workspace = true, features = ["signature-verification"] }
+bamabi_host_sys = { workspace = true, features = ["test-utils", "signature-verification"] }
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+
+[lints]
+workspace = true

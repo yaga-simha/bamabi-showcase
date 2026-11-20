@@ -1,0 +1,77 @@
+name: Nightly
+
+on:
+  schedule:
+    - cron: "15 3 * * *"
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # ============================================================================
+  # 1. Verify all 8 LibFuzzer targets compile cleanly
+  # ============================================================================
+  fuzz-check:
+    name: Fuzz Targets Compile Check (8 bins)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout bamabi-showcase
+        uses: actions/checkout@v6
+
+      - name: Install nightly Rust toolchain
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Install `cargo-fuzz`
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-fuzz
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Verify all 8 fuzz targets compile under libFuzzer
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(cargo +nightly fuzz list | wc -l)" -eq 8
+          cargo +nightly fuzz check
+
+  # ============================================================================
+  # 2. Nightly LibFuzzer Corpus Matrix (5 targets x 600s)
+  # ============================================================================
+  fuzz:
+    name: Fuzz (${{ matrix.target }})
+    needs: fuzz-check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - fuzz_read_extensible
+          - fuzz_system_desc
+          - fuzz_commands
+          - fuzz_cstr_array
+          - fuzz_sshsig_and_krl
+    steps:
+      - name: Checkout bamabi-showcase
+        uses: actions/checkout@v6
+
+      - name: Install nightly Rust toolchain
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Install `cargo-fuzz`
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-fuzz
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: fuzz-${{ matrix.target }}
+
+      - name: Run `${{ matrix.target }}` against seed corpus (600s)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +nightly fuzz run "${{ matrix.target }}" "fuzz/corpus/${{ matrix.target }}" -- -max_total_time=600

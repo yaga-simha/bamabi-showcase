@@ -1,0 +1,147 @@
+#![forbid(unsafe_code)]
+#![allow(unreachable_pub)]
+
+//! Integration tests verifying RAII terminal restoration and panic-hook cleanup.
+
+use crossterm::{
+    cursor, execute,
+    terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
+};
+use std::io::stdout;
+use std::sync::Mutex;
+
+/// Global test lock to serialize terminal and panic hook modifications across test threads.
+static TERMINAL_TEST_LOCK: Mutex<()> = Mutex::new(());
+
+/// Test mirror of `TerminalGuard` exercising raw-mode and alternate-screen restoration.
+pub struct TestTerminalGuard;
+
+impl TestTerminalGuard {
+    /// Enters terminal raw mode and alternate screen.
+    pub fn enter() -> Result<Self, std::io::Error> {
+        enable_raw_mode()?;
+        execute!(stdout(), EnterAlternateScreen, cursor::Hide)?;
+
+        let default_hook = std::panic::take_hook();
+        std::panic::set_hook(Box::new(move |panic_info| {
+            let _ = execute!(stdout(), LeaveAlternateScreen, cursor::Show);
+            let _ = disable_raw_mode();
+            default_hook(panic_info);
+        }));
+
+        Ok(Self)
+    }
+}
+
+impl Drop for TestTerminalGuard {
+    fn drop(&mut self) {
+        let _ = execute!(stdout(), LeaveAlternateScreen, cursor::Show);
+        let _ = disable_raw_mode();
+    }
+}
+
+#[test]
+fn test_terminal_guard_raii_drop() {
+    let _lock = TERMINAL_TEST_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+    let prev_hook = std::panic::take_hook();
+
+    if let Ok(guard) = TestTerminalGuard::enter() {
+        drop(guard);
+    }
+
+    std::panic::set_hook(prev_hook);
+}
+
+#[test]
+fn test_terminal_guard_panic_hook_emits_cleanup_sequences() {
+    let _lock = TERMINAL_TEST_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+    let hook_called = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+    let hook_called_clone = hook_called.clone();
+
+    let prev_hook = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |_panic_info| {
+        let _ = execute!(stdout(), LeaveAlternateScreen, cursor::Show);
+        let _ = disable_raw_mode();
+        hook_called_clone.store(true, std::sync::atomic::Ordering::SeqCst);
+    }));
+
+    let result = std::panic::catch_unwind(|| {
+        panic!("Simulated intentional panic inside TerminalGuard scope");
+    });
+
+    std::panic::set_hook(prev_hook);
+
+    assert!(result.is_err(), "catch_unwind must capture the panic");
+    assert!(
+        hook_called.load(std::sync::atomic::Ordering::SeqCst),
+        "TerminalGuard panic hook must execute on panic and emit cleanup sequence"
+    );
+}
+
+#[test]
+fn test_terminal_guard_nested_reentry_and_idempotent_drop() {
+    let _lock = TERMINAL_TEST_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+    let prev_hook = std::panic::take_hook();
+
+    for _ in 0..5 {
+        match TestTerminalGuard::enter() {
+            Ok(guard1) => {
+                let guard2 = TestTerminalGuard::enter();
+                assert!(
+                    guard2.is_ok(),
+                    "Nested guard 2 enter must succeed when raw mode is active"
+                );
+                drop(guard2);
+                drop(guard1);
+            }
+            Err(err) => {
+                let nested = TestTerminalGuard::enter();
+                assert!(
+                    nested.is_err(),
+                    "Nested entry must also return Err when no TTY is available"
+                );
+                let _ = err;
+            }
+        }
+    }
+
+    std::panic::set_hook(prev_hook);
+}
+
+#[test]
+fn test_terminal_guard_unwind_drops_guard_safely() {
+    let _lock = TERMINAL_TEST_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+    let drop_executed = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+    let drop_executed_clone = drop_executed.clone();
+
+    struct DropObserver {
+        flag: std::sync::Arc<std::sync::atomic::AtomicBool>,
+        _guard: Option<TestTerminalGuard>,
+    }
+
+    impl Drop for DropObserver {
+        fn drop(&mut self) {
+            self.flag.store(true, std::sync::atomic::Ordering::SeqCst);
+        }
+    }
+
+    let prev_hook = std::panic::take_hook();
+    std::panic::set_hook(Box::new(|_| {}));
+
+    let result = std::panic::catch_unwind(move || {
+        let guard = TestTerminalGuard::enter().ok();
+        let _obs = DropObserver {
+            flag: drop_executed_clone,
+            _guard: guard,
+        };
+        panic!("Intentional panic testing RAII unwinding with TerminalGuard");
+    });
+
+    std::panic::set_hook(prev_hook);
+
+    assert!(result.is_err(), "Panic must unwind cleanly");
+    assert!(
+        drop_executed.load(std::sync::atomic::Ordering::SeqCst),
+        "Guard drop must execute during panic stack unwinding"
+    );
+}

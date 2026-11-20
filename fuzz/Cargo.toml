@@ -1,0 +1,82 @@
+[package]
+name = "bamabi_fuzz"
+version = "0.3.0"
+edition = "2024"
+rust-version = "1.95"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[workspace]
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+improper_ctypes_definitions = "deny"
+
+[dependencies]
+libfuzzer-sys = "0.4"
+bamabi_sys = { git = "https://github.com/yaga-simha/bamabi-wire.git", branch = "main" }
+bamabi_trust = { git = "https://github.com/yaga-simha/bamabi-tools.git", branch = "main" }
+bamabi_manifest = { git = "https://github.com/yaga-simha/bamabi-tools.git", branch = "main" }
+bamabi_host_sys = { git = "https://github.com/yaga-simha/bamabi-core.git", branch = "main", features = ["strict-ffi-checks", "signature-verification"] }
+bamabi_host = { git = "https://github.com/yaga-simha/bamabi-core.git", branch = "main", features = ["strict-ffi-checks"] }
+bevy_ecs = { version = "0.20.1", default-features = false, features = ["std", "async_executor"] }
+semver = "1"
+
+[[bin]]
+name = "fuzz_read_extensible"
+path = "fuzz_targets/fuzz_read_extensible.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_system_desc"
+path = "fuzz_targets/fuzz_system_desc.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_commands"
+path = "fuzz_targets/fuzz_commands.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_cstr_array"
+path = "fuzz_targets/fuzz_cstr_array.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_sshsig_and_krl"
+path = "fuzz_targets/fuzz_sshsig_and_krl.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_mod_manifest"
+path = "fuzz_targets/fuzz_mod_manifest.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_v03_relations"
+path = "fuzz_targets/fuzz_v03_relations.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_bampack_manifest"
+path = "fuzz_targets/fuzz_bampack_manifest.rs"
+test = false
+doc = false
+bench = false

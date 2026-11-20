@@ -1,0 +1,374 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # ============================================================================
+  # 1. Quality Gates (Typos, Deny, Fmt, Clippy, Fuzz Clippy, Rustdoc, xtask, mdBook)
+  # ============================================================================
+  quality-gates:
+    name: Quality Gates & Static Audits
+    runs-on: ubuntu-latest
+    env:
+      CARGO_PROFILE_DEV_DEBUG: "line-tables-only"
+      CARGO_PROFILE_TEST_DEBUG: "line-tables-only"
+    steps:
+      - name: Free disk space on Linux runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h
+
+      - name: Install Linux audio, windowing & input system headers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev libudev-dev libx11-dev libxi-dev libxkbcommon-dev \
+            libwayland-dev libegl-dev libxcursor-dev libxrandr-dev libxinerama-dev \
+            pkg-config
+
+      - name: Checkout bamabi-showcase
+        uses: actions/checkout@v6
+
+      - name: Install stable Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Install Zig toolchain
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.16.0
+
+      - name: Install mdBook
+        uses: peaceiris/actions-mdbook@v2
+        with:
+          mdbook-version: "0.4.48"
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Spellcheck repository (`typos`)
+        uses: crate-ci/typos@v1.31.1
+
+      - name: Install `cargo-deny`
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny
+
+      - name: Audit advisories, licenses, bans & sources (`cargo-deny`)
+        run: cargo deny --all-features check advisories licenses bans sources
+
+      - name: Formatting, forbid(unsafe_code), clippy, fuzz & bench checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo fmt --all -- --check
+          grep -q '#!\[forbid(unsafe_code)\]' xtask/src/main.rs
+          cargo clippy --workspace --all-targets -- -D warnings
+          cargo clippy --workspace --all-targets --all-features -- -D warnings
+          cargo clippy --manifest-path fuzz/Cargo.toml --bins -- -D warnings
+          cargo check --manifest-path benches/deterministic_gate/Cargo.toml --benches
+          cargo check --manifest-path benches/c_abi_rust_mod/Cargo.toml
+
+      - name: Rustdoc build (default and all-features)
+        env:
+          RUSTDOCFLAGS: "-D warnings"
+        run: |
+          cargo doc --workspace --no-deps
+          cargo doc --workspace --no-deps --all-features
+
+      - name: Standalone xtask lint, C99 header checks & mdBook build
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo xtask lint --quick
+          cargo xtask header --check --test-c99
+          cargo xtask gen-component-headers --check
+          mdbook build docs/book
+
+  # ============================================================================
+  # 2. Cross-OS Test Matrix (Linux, macOS, Windows)
+  # ============================================================================
+  test-matrix:
+    name: Test Matrix (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    env:
+      CARGO_PROFILE_DEV_DEBUG: "line-tables-only"
+      CARGO_PROFILE_TEST_DEBUG: "line-tables-only"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Free disk space on Linux runner
+        if: runner.os == 'Linux'
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h
+
+      - name: Install Linux audio, windowing & input system headers
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev libudev-dev libx11-dev libxi-dev libxkbcommon-dev \
+            libwayland-dev libegl-dev libxcursor-dev libxrandr-dev libxinerama-dev \
+            pkg-config
+
+      - name: Checkout bamabi-showcase
+        uses: actions/checkout@v6
+
+      - name: Initialize MSVC Developer Environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Install stable Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Zig toolchain
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.16.0
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Stage headers, fixtures, run workspace tests, doctests & non-Linux gate
+        shell: bash
+        env:
+          MSYS_NO_PATHCONV: "1"
+        run: |
+          set -euo pipefail
+          if [ -n "${VCToolsInstallDir:-}" ] && command -v cygpath >/dev/null 2>&1; then
+            MSVC_BIN="$(cygpath -u "${VCToolsInstallDir}bin/Hostx64/x64")"
+            if [ -x "${MSVC_BIN}/link.exe" ]; then
+              export PATH="${MSVC_BIN}:${PATH}"
+            fi
+          fi
+          cargo xtask header --check --test-c99
+          cargo xtask fixtures --examples
+          BAM_FIXTURE_DIR="$PWD/target/fixtures" cargo test --workspace
+          cargo test --doc --all-features
+          if [ "${{ runner.os }}" != "Linux" ]; then
+            cargo bench --manifest-path benches/deterministic_gate/Cargo.toml
+          fi
+
+  # ============================================================================
+  # 3. Heavy Examples, xtask CI & End-to-End Integration Smoke Runs
+  # ============================================================================
+  heavy-examples-and-e2e:
+    name: Heavy Examples & Standalone xtask CI
+    runs-on: ubuntu-latest
+    env:
+      CARGO_PROFILE_DEV_DEBUG: "line-tables-only"
+      CARGO_PROFILE_TEST_DEBUG: "line-tables-only"
+    steps:
+      - name: Free disk space on Linux runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h
+
+      - name: Install Linux audio, windowing & input system headers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev libudev-dev libx11-dev libxi-dev libxkbcommon-dev \
+            libwayland-dev libegl-dev libxcursor-dev libxrandr-dev libxinerama-dev \
+            pkg-config
+
+      - name: Checkout bamabi-showcase
+        uses: actions/checkout@v6
+
+      - name: Install stable Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Install Zig toolchain
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.16.0
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run standalone `cargo xtask ci` and build all example fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo xtask ci
+          cargo xtask fixtures --examples
+          (cd examples/08_zig_guest/zig_mod && zig build -Doptimize=ReleaseFast)
+
+      - name: Run headless smoke checks across Examples 01..10 & E2E tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo run -p example_01_minimal_handshake
+          cargo run -p example_02_multi_system_pipeline
+          cargo run -p example_03_cross_language_interop
+          cargo run -p example_04_visual_game -- --test-mode --ticks 30
+          cargo run -p example_05_cute_3d_winit -- --test-mode --ticks 45
+          cargo run -p example_06_cross_mod_components
+          cargo run -p example_07_cpp17_guest
+          cargo run -p example_08_zig_guest
+          cargo run -p example_09_bql_wire_parity
+          cargo run -p example_10_bevy20_full_companion -- --headless
+          BAM_FIXTURE_DIR="$PWD/target/fixtures" cargo test -p xtask
+          cargo test --test bql_wire_contract_test
+
+  # ============================================================================
+  # 4. Cross-OS Polyglot Asymmetry Matrix (gcc, clang, cl.exe, Zig 0.16.0)
+  # ============================================================================
+  asymmetry-polyglot:
+    name: Polyglot Asymmetry (${{ matrix.os }}, ${{ matrix.cc }})
+    runs-on: ${{ matrix.os }}
+    env:
+      CARGO_PROFILE_DEV_DEBUG: "line-tables-only"
+      CARGO_PROFILE_TEST_DEBUG: "line-tables-only"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+          - os: ubuntu-latest
+            cc: clang
+            cxx: clang++
+          - os: macos-latest
+            cc: clang
+            cxx: clang++
+          - os: windows-latest
+            cc: gcc
+            cxx: g++
+          - os: windows-latest
+            cc: cl.exe
+            cxx: cl.exe
+    steps:
+      - name: Free disk space on Linux runner
+        if: runner.os == 'Linux'
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h
+
+      - name: Install Linux audio, windowing & input system headers
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev libudev-dev libx11-dev libxi-dev libxkbcommon-dev \
+            libwayland-dev libegl-dev libxcursor-dev libxrandr-dev libxinerama-dev \
+            pkg-config
+
+      - name: Checkout bamabi-showcase
+        uses: actions/checkout@v6
+
+      - name: Initialize MSVC Developer Environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Install stable Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Zig toolchain
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.16.0
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: polyglot-${{ matrix.os }}-${{ matrix.cc }}
+
+      - name: Run `cargo bam doctor --require-c` probe
+        if: matrix.os == 'ubuntu-latest' && matrix.cc == 'gcc'
+        shell: bash
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: |
+          set -euo pipefail
+          cargo install --git https://github.com/yaga-simha/bamabi-tools.git --branch main cargo-bam
+          cargo bam doctor --require-c
+
+      - name: Verify C99/C++17/Zig polyglot guests under ${{ matrix.cc }} / ${{ matrix.cxx }}
+        shell: bash
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+          MSYS_NO_PATHCONV: "1"
+        run: |
+          set -euo pipefail
+          if [ -n "${VCToolsInstallDir:-}" ] && command -v cygpath >/dev/null 2>&1; then
+            MSVC_BIN="$(cygpath -u "${VCToolsInstallDir}bin/Hostx64/x64")"
+            if [ -x "${MSVC_BIN}/link.exe" ]; then
+              export PATH="${MSVC_BIN}:${PATH}"
+            fi
+          fi
+          cargo xtask header --check --test-c99
+          (cd examples/08_zig_guest/zig_mod && zig build -Doptimize=ReleaseFast)
+          cargo test -p example_07_cpp17_guest
+          cargo run -p example_07_cpp17_guest
+          cargo test -p example_08_zig_guest
+          cargo run -p example_08_zig_guest
+          cargo test --test bql_wire_contract_test
+          cargo run -p example_03_cross_language_interop
+
+  # ============================================================================
+  # 5. Deterministic Benchmark Regression Gate (Valgrind + iai-callgrind 0.16.1)
+  # ============================================================================
+  benchmark-gate:
+    name: Benchmark Regression Gate (iai-callgrind)
+    runs-on: ubuntu-latest
+    env:
+      CARGO_PROFILE_DEV_DEBUG: "line-tables-only"
+      CARGO_PROFILE_TEST_DEBUG: "line-tables-only"
+    steps:
+      - name: Free disk space on Linux runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h
+
+      - name: Install Valgrind & Linux headers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            valgrind libasound2-dev libudev-dev libx11-dev libxi-dev libxkbcommon-dev \
+            libwayland-dev libegl-dev libxcursor-dev libxrandr-dev libxinerama-dev \
+            pkg-config
+
+      - name: Checkout bamabi-showcase
+        uses: actions/checkout@v6
+
+      - name: Install stable Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install `iai-callgrind-runner` 0.16.1
+        uses: taiki-e/install-action@v2
+        with:
+          tool: iai-callgrind-runner@0.16.1
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: bench-gate
+
+      - name: Run deterministic Callgrind gate & permutation benchmark build smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo bench --manifest-path benches/deterministic_gate/Cargo.toml
+          cargo xtask header --check --test-c99
+          cargo xtask fixtures --benches
+          cargo build --release -p coupled_rust_mod -p permutation_bench

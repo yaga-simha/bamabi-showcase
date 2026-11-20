@@ -1,0 +1,20 @@
+[package]
+name = "shared_scenario"
+version = "0.3.0"
+edition = "2024"
+rust-version = "1.95"
+license = "MIT OR Apache-2.0"
+authors = ["bamabi authors"]
+publish = false
+
+[lib]
+crate-type = ["dylib"]
+test = false
+doctest = false
+
+[dependencies]
+bamabi_sys = { git = "https://github.com/yaga-simha/bamabi-wire.git", branch = "main" }
+bamabi_macros = { git = "https://github.com/yaga-simha/bamabi-wire.git", branch = "main" }
+bamabi_host = { git = "https://github.com/yaga-simha/bamabi-core.git", branch = "main" }
+bevy_ecs = { version = "0.20.1", default-features = false, features = ["std", "async_executor"] }
+bevy_app = { version = "0.20.1", default-features = false, features = ["std"] }

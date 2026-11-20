@@ -1,0 +1,15 @@
+[package]
+name = "mod_carousel"
+version = "0.3.0"
+edition = "2024"
+rust-version = "1.87"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+bamabi_guest = { git = "https://github.com/yaga-simha/bamabi-wire.git", branch = "main", features = ["derive"] }

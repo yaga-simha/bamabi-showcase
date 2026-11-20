@@ -1,0 +1,16 @@
+[book]
+title = "The bamabi Developer Guide (ABI 0.3.0)"
+description = "Asymmetric, zero-serialization C-ABI native modding framework for Bevy ECS (v0.20+)"
+authors = ["bamabi authors"]
+language = "en"
+src = "src"
+
+[build]
+build-dir = "../../target/book"
+create-missing = false
+
+[output.html]
+default-theme = "rust"
+preferred-dark-theme = "ayu"
+git-repository-url = "https://github.com/yaga-simha/bamabi-showcase"
+no-section-label = false

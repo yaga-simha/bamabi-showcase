@@ -1,0 +1,17 @@
+[package]
+name = "example_03_cross_language_interop"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+bamabi = { workspace = true }
+bamabi_sys = { workspace = true }
+bamabi_sdk_gen = { workspace = true }
+
+[lints]
+workspace = true
