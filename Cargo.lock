@@ -3124,6 +3124,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "example_11_runtime_chain_studio"
+version = "0.3.0"
+dependencies = [
+ "bamabi",
+ "bamabi_host_sys",
+ "bamabi_sdk_gen",
+ "bamabi_sys",
+ "bevy_app",
+ "bevy_ecs",
+ "bytemuck",
+ "futures-executor",
+ "glam 0.33.12",
+ "wgpu",
+ "winit",
+]
+
+[[package]]
 name = "fastrand"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

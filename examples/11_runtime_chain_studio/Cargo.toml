@@ -1,0 +1,23 @@
+[package]
+name = "example_11_runtime_chain_studio"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+bamabi = { workspace = true }
+bamabi_host_sys = { workspace = true }
+bamabi_sdk_gen = { workspace = true }
+bamabi_sys = { workspace = true }
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+bytemuck = { version = "1.25", features = ["derive"] }
+futures-executor = "0.3.34"
+glam = "0.33"
+wgpu = { version = "30", default-features = false, features = ["std", "parking_lot", "dx12", "metal", "vulkan", "wgsl"] }
+winit = { version = "0.30.13", default-features = false, features = ["rwh_06", "x11", "wayland", "wayland-dlopen"] }
+
+[lints]
+workspace = true

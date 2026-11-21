@@ -1,0 +1,25 @@
+[workspace]
+resolver = "2"
+members = [
+    "studio_abi",
+    "mod_spin",
+    "mod_color",
+    "mod_scale",
+    "mod_motion",
+    "mod_vortex",
+    "mod_ripple",
+    "mod_aura",
+    "mod_aura_link",
+    "mod_chaos",
+]
+
+[workspace.package]
+version = "0.3.0"
+edition = "2024"
+rust-version = "1.87"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[workspace.dependencies]
+bamabi_guest = { git = "https://github.com/yaga-simha/bamabi-wire.git", branch = "main", features = ["derive"] }
+studio_abi = { path = "studio_abi" }

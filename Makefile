@@ -124,6 +124,15 @@ game-3d: example-5 ## Alias for example-5
 example-5-test: build-example-mods ## Run Example 5: Cute 3D Slime Meadow in headless test mode
 	cargo run --manifest-path examples/05_cute_3d_winit/Cargo.toml --release -- --test-mode --ticks 45
 
+.PHONY: example-11 studio example-11-test
+example-11: ## Run Example 11: Runtime Mod Chain Studio (winit + wgpu + interactive REPL)
+	cargo run -p example_11_runtime_chain_studio --release -- --build-mods
+
+studio: example-11 ## Alias for example-11
+
+example-11-test: ## Run Example 11: Automated end-to-end verification of all bamabi capabilities
+	cargo run -p example_11_runtime_chain_studio --release -- --test-mode
+
 examples: example-1 example-2 example-3 example-4-test example-5-test ## Run progression examples sequentially
 
 .PHONY: clean clean-mods
