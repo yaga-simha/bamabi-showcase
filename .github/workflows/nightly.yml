@@ -35,7 +35,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(cargo +nightly fuzz list | wc -l)" -eq 8
-          cargo +nightly fuzz check
+          cargo +nightly fuzz check --target x86_64-unknown-linux-gnu
 
   # ============================================================================
   # 2. Nightly LibFuzzer Corpus Matrix (5 targets x 600s)
@@ -74,4 +74,4 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cargo +nightly fuzz run "${{ matrix.target }}" "fuzz/corpus/${{ matrix.target }}" -- -max_total_time=600
+          cargo +nightly fuzz run --target x86_64-unknown-linux-gnu "${{ matrix.target }}" "fuzz/corpus/${{ matrix.target }}" -- -max_total_time=600

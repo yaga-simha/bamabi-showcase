@@ -155,7 +155,11 @@ jobs:
           fi
           cargo xtask header --check --test-c99
           cargo xtask fixtures --examples
-          BAM_FIXTURE_DIR="$PWD/target/fixtures" cargo test --workspace
+          FIXTURE_DIR="$PWD/target/fixtures"
+          if command -v cygpath >/dev/null 2>&1; then
+            FIXTURE_DIR="$(cygpath -m "$FIXTURE_DIR")"   # native D:/a/... path on Windows
+          fi
+          BAM_FIXTURE_DIR="$FIXTURE_DIR" cargo test --workspace
           cargo test --doc --all-features
           if [ "${{ runner.os }}" != "Linux" ]; then
             cargo bench --manifest-path benches/deterministic_gate/Cargo.toml
