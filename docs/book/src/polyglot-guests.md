@@ -1,6 +1,6 @@
 # ISO C99, C++17 & Zig Guest Guide
 
-All non-Rust languages target the single auto-generated header `bamabi.h` emitted by `bamabi_sdk_gen` (`cargo bam export-sdk --out include` or `cargo xtask header`, which stages `target/include/bamabi.h` standalone or checks `bamabi-wire/include/bamabi.h` when present), alongside `bamabi.hpp` (C++17) and `bamabi.zig` (Zig). Every export includes platform `BAM_EXPORT` macros (`__declspec(dllexport)` on Windows `_WIN32`, visibility attributes on ELF/Mach-O), `BAM_RESTRICT` non-aliasing hints (`__restrict` on MSVC, `restrict` in C99/C11, `"noalias"` in Zig), all 68 `BAM_HOST_API_OFFSET_*` slot offsets, and compile-time `BAM_STATIC_ASSERT` (`sizeof`, `alignof`, `offsetof`) verification on both 64-bit and 32-bit targets.
+All non-Rust languages target the single auto-generated header `bamabi.h` emitted by `bamabi_sdk_gen` (`cargo bam export-sdk --out include` or `cargo xtask header`, which stages `target/include/bamabi.h` standalone or checks `bamabi-wire/include/bamabi.h` when present), alongside `bamabi.hpp` (C++17) and `bamabi.zig` (Zig). Every export includes platform `BAM_EXPORT` macros (`__declspec(dllexport)` on Windows `_WIN32`, visibility attributes on ELF/Mach-O), `BAM_RESTRICT` non-aliasing hints (`__restrict` on MSVC, `restrict` in C99/C11, `"noalias"` in Zig), all 73 `BAM_HOST_API_OFFSET_*` slot offsets, and compile-time `BAM_STATIC_ASSERT` (`sizeof`, `alignof`, `offsetof`) verification on both 64-bit and 32-bit targets.
 
 ---
 

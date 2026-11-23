@@ -77,6 +77,7 @@ match_same_arms = "warn"
 bamabi_sys = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-wire.git", branch = "main" }
 bamabi_macros = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-wire.git", branch = "main" }
 bamabi_sdk_gen = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-wire.git", branch = "main" }
+bamabi_guest = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-wire.git", branch = "main", features = ["derive"] }
 bamabi_trust = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-tools.git", branch = "main" }
 bamabi_manifest = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-tools.git", branch = "main" }
 bamabi_host_sys = { version = "0.3.0", git = "https://github.com/yaga-simha/bamabi-core.git", branch = "main" }

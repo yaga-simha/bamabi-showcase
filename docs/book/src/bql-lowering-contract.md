@@ -1,6 +1,6 @@
 # `bevy_bql` Compiler Lowering Contract (`ABI 0.3.0`)
 
-`ABI 0.3.0` (`0x0003_0000`) provides a frozen, self-describing, zero-serialization target for AOT and JIT ECS compilers (such as **`bevy_bql`** / **`bql_jit`**) as well as hand-written ISO C99, C++17, Zig, and Safe Rust guest modules. All **68/68** `BamHostApi` slots are live on the host (`552` B on 64-bit / `280` B on 32-bit).
+`ABI 0.3.0` (`0x0003_0000`) provides a frozen, self-describing, zero-serialization target for AOT and JIT ECS compilers (such as **`bevy_bql`** / **`bql_jit`**) as well as hand-written ISO C99, C++17, Zig, and Safe Rust guest modules. All **73/73** `BamHostApi` slots are live on the host (`592` B on 64-bit / `300` B on 32-bit; `MIN_V0_3_SIZE = 552` B / `280` B).
 
 For exact struct byte layouts and field-level specifications, see `bamabi-wire/spec.md` §4.7 and `bamabi-core/docs/ARCHITECTURE.md` §3.2.
 
@@ -10,11 +10,11 @@ For exact struct byte layouts and field-level specifications, see `bamabi-wire/s
 
 Compilers and JIT emitters never hardcode magic table offsets:
 
-- **Rust (`bamabi_sys::offsets`):** Exports all 70 `BamHostApi` fields (`STRUCT_SIZE`, `ABI_VERSION`, plus all 68 function-pointer slots) as:
+- **Rust (`bamabi_sys::offsets`):** Exports all 75 `BamHostApi` fields (`STRUCT_SIZE`, `ABI_VERSION`, plus all 73 function-pointer slots) as:
   - Target-native `<FIELD>` (`core::mem::offset_of!`)
-  - Architecture-independent 64-bit `OFF64_<FIELD>` (`SIZE_64 = 552`, slot `k` at `8 + 8 * k`)
-  - Architecture-independent 32-bit `OFF32_<FIELD>` (`SIZE_32 = 280`, slot `k` at `8 + 4 * k`)
-  - `SLOT_COUNT = 68`
+  - Architecture-independent 64-bit `OFF64_<FIELD>` (`SIZE_64 = 592`, slot `k` at `8 + 8 * k`)
+  - Architecture-independent 32-bit `OFF32_<FIELD>` (`SIZE_32 = 300`, slot `k` at `8 + 4 * k`)
+  - `SLOT_COUNT = 73`
 - **C99 / C++17 / Zig (`bamabi_sdk_gen`):** Mirrors every slot via `BAM_HOST_API_OFFSET_<SLOT_UPPER>` in `include/bamabi.h`, `bam::offsets::*` in `bamabi.hpp`, and `offsets.*` / `BAM_HOST_API_OFFSET_*` in `bamabi.zig`.
 - **`BAM_RESTRICT`:** Expands to `__restrict` under MSVC (`_MSC_VER`), `restrict` under ISO C99/C11 (`!defined(__cplusplus) && __STDC_VERSION__ >= 199901L`), and `"noalias"` in Zig (`BAM_RESTRICT_QUALIFIER`), allowing backends to vectorize loops over disjoint SoA columns returned by `iter_column_readonly` and `iter_column_mutable`.
 

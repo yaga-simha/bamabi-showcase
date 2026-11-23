@@ -1,6 +1,6 @@
 # Rust Guest SDK Guide (`bamabi_guest`)
 
-`bamabi_guest` (`v0.3.0`) provides an ergonomic, `#![forbid(unsafe_code)]` Rust SDK covering all **68/68** `ABI 0.3.0` host slots for building `.cdylib` mods with **zero `bevy` dependencies**.
+`bamabi_guest` (`v0.3.0`) provides an ergonomic, `#![forbid(unsafe_code)]` Rust SDK covering all **73/73** `ABI 0.3.0` host slots for building `.cdylib` mods with **zero `bevy` dependencies**.
 
 ---
 
@@ -42,7 +42,7 @@ export_mod!(plugin: PhysicsMod);
 
 ## 3. Unified System Builder, 16-Term Queries & Decoupled Schedule Sets
 
-`GuestApp::system` configures single-query and multi-query (`0..=8`) systems, typed tuple queries up to **16 terms** (`QueryTuple`), tuple-generic **`Or<(T0..T7)>`** (2..=8 filter branches, preserving `Or2`/`Or3` aliases), schedules, ordering, `run_if` predicates, and main-thread pinning:
+`GuestApp::system` configures single-query and multi-query (`0..=16`, `MAX_QUERIES_PER_SYSTEM`) systems, typed tuple queries up to **16 terms** (`QueryTuple`, out of `MAX_TERMS_PER_QUERY = 32` wire terms), tuple-generic **`Or<(T0..T7)>`** (2..=8 filter branches, preserving `Or2`/`Or3` aliases), schedules, ordering, `run_if` predicates, and main-thread pinning:
 
 ```rust
 let res = app.system(c"integrate_velocity")

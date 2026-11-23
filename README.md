@@ -9,7 +9,7 @@ Refactored from the original [`bevy_mod_abi`](https://github.com/yaga-simha/bevy
 - **Developer Guide (mdBook):** [`docs/book/src/SUMMARY.md`](docs/book/src/SUMMARY.md) — build locally with `mdbook build docs/book` (outputs to `target/book`).
 - **Performance Benchmarks & Gates:** [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) — 9-scenario throughput baselines, cross-language permutation results, and deterministic regression gates.
 
-## Progressive Examples (`examples/01..10`)
+## Progressive Examples (`examples/01..11`)
 
 | # | Example | Highlights |
 |---|---|---|
@@ -23,10 +23,11 @@ Refactored from the original [`bevy_mod_abi`](https://github.com/yaga-simha/bevy
 | 08 | [`08_zig_guest`](examples/08_zig_guest/README.md) | Zig guest mod (`@cImport` / `addTranslateC`) with error-union `BamResult` mapping |
 | 09 | [`09_bql_wire_parity`](examples/09_bql_wire_parity/README.md) | 500-frame bit-identical C99 vs. Safe Rust `bevy_bql` wire parity + frame-250 v1→v2 column migration |
 | 10 | [`10_bevy20_full_companion`](examples/10_bevy20_full_companion/README.md) | Full Bevy `0.20.1` companion stack (presets, `.wesl` materials, `SubApp`, BRP/reflect, savegames, telemetry) |
+| 11 | [`11_runtime_chain_studio`](examples/11_runtime_chain_studio/README.md) | Interactive 3D `winit` + `wgpu` + REPL runtime mod chain studio across 11 Rust/C99/C++17 native libraries (18 chainable systems) |
 
 ## Repository Contents
 
-- `examples/01..10/` — Progressive host + guest mod examples (Rust, C99, C++17, Zig).
+- `examples/01..11/` — Progressive host + guest mod examples (Rust, C99, C++17, Zig).
 - `benches/` — Criterion chunk throughput, cross-language permutation benchmarks, and deterministic gates.
 - `fuzz/` — LibFuzzer targets (`fuzz_sshsig_and_krl`, `fuzz_v03_relations`, `fuzz_bampack_manifest`, etc.).
 - `tests/` — Integration contract suite (`bql_wire_contract_test.rs`; host lifecycle tests live in `bamabi-core/tests/` and `xtask/tests/`).
@@ -77,6 +78,7 @@ cargo run -p example_07_cpp17_guest
 cargo run -p example_08_zig_guest
 cargo run -p example_09_bql_wire_parity
 cargo run -p example_10_bevy20_full_companion -- --headless
+make example-11-test
 
 # Static audits, fuzz clippy, Zig build, benchmarks & mdBook
 typos
@@ -99,7 +101,7 @@ mdbook build docs/book
 | **1** | `bamabi-tools` | `https://github.com/yaga-simha/bamabi-tools.git` | Zero-Bevy Ed25519 trust (`bamabi_trust`), manifest DAG (`bamabi_manifest`), and `cargo-bam` CLI |
 | **2** | `bamabi-core` | `https://github.com/yaga-simha/bamabi-core.git` | Headless `bevy_ecs` + `bevy_app` host runtime (`bamabi_host_sys`, `bamabi_host`, `bamabi_watcher`) and `docs/ARCHITECTURE.md` |
 | **3** | `bamabi` | `https://github.com/yaga-simha/bamabi.git` | Canonical Bevy `0.20.1` host library facade (`bamabi`, `bamabi_bridges`, `bamabi_render`, `bamabi_reflect`) |
-| **4** | **`bamabi-showcase`** *(this repo)* | `https://github.com/yaga-simha/bamabi-showcase.git` | **Top-level integration repository**: examples (`01`–`10`), benchmarks, fuzzing, wire-contract tests, mdBook guide, and `xtask` |
+| **4** | **`bamabi-showcase`** *(this repo)* | `https://github.com/yaga-simha/bamabi-showcase.git` | **Top-level integration repository**: examples (`01`–`11`), benchmarks, fuzzing, wire-contract tests, mdBook guide, and `xtask` |
 | — | `bamabi-dev-overlay` | `https://github.com/yaga-simha/bamabi-dev-overlay.git` | Multi-repo `sync_check.py` verifier and local Cargo `[patch]` sibling `overlay.py` manager |
 
 ## License

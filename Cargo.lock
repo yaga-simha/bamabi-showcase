@@ -383,7 +383,7 @@ dependencies = [
 [[package]]
 name = "bamabi"
 version = "0.3.0"
-source = "git+https://github.com/yaga-simha/bamabi.git?branch=main#557989270e93c873aad72b77aeb6aeda385d6a61"
+source = "git+https://github.com/yaga-simha/bamabi.git?branch=main#b7be7addb8ebedfb67fcb6aa9d95e3ec2acb9d72"
 dependencies = [
  "bamabi_bridges",
  "bamabi_host",
@@ -396,7 +396,7 @@ dependencies = [
 [[package]]
 name = "bamabi_bridges"
 version = "0.3.0"
-source = "git+https://github.com/yaga-simha/bamabi.git?branch=main#557989270e93c873aad72b77aeb6aeda385d6a61"
+source = "git+https://github.com/yaga-simha/bamabi.git?branch=main#b7be7addb8ebedfb67fcb6aa9d95e3ec2acb9d72"
 dependencies = [
  "bamabi_host",
  "bamabi_host_sys",
@@ -432,7 +432,7 @@ dependencies = [
 [[package]]
 name = "bamabi_host"
 version = "0.3.0"
-source = "git+https://github.com/yaga-simha/bamabi-core.git?branch=main#8d1011f1f8167e697cacda328aa4756bc0b7f310"
+source = "git+https://github.com/yaga-simha/bamabi-core.git?branch=main#9fd8155a6f34339896a57b072c8871cee733b1b3"
 dependencies = [
  "bamabi_host_sys",
  "bamabi_macros",
@@ -450,7 +450,7 @@ dependencies = [
 [[package]]
 name = "bamabi_host_sys"
 version = "0.3.0"
-source = "git+https://github.com/yaga-simha/bamabi-core.git?branch=main#8d1011f1f8167e697cacda328aa4756bc0b7f310"
+source = "git+https://github.com/yaga-simha/bamabi-core.git?branch=main#9fd8155a6f34339896a57b072c8871cee733b1b3"
 dependencies = [
  "arc-swap",
  "bamabi_sys",
@@ -469,7 +469,7 @@ dependencies = [
 [[package]]
 name = "bamabi_macros"
 version = "0.3.0"
-source = "git+https://github.com/yaga-simha/bamabi-wire.git?branch=main#7a32b7bd329167c8dda82259659b3da54a5ab748"
+source = "git+https://github.com/yaga-simha/bamabi-wire.git?branch=main#433df66cca7388e4d4bae80c649060261612af57"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -480,7 +480,7 @@ dependencies = [
 [[package]]
 name = "bamabi_manifest"
 version = "0.3.0"
-source = "git+https://github.com/yaga-simha/bamabi-tools.git?branch=main#c66399f6c04fc6a10b33ede36140a50018c6a1a4"
+source = "git+https://github.com/yaga-simha/bamabi-tools.git?branch=main#e57356615fb356619c7a5194bc928dddf909cf85"
 dependencies = [
  "bamabi_sys",
  "semver",
@@ -491,7 +491,7 @@ dependencies = [
 [[package]]
 name = "bamabi_reflect"
 version = "0.3.0"
-source = "git+https://github.com/yaga-simha/bamabi.git?branch=main#557989270e93c873aad72b77aeb6aeda385d6a61"
+source = "git+https://github.com/yaga-simha/bamabi.git?branch=main#b7be7addb8ebedfb67fcb6aa9d95e3ec2acb9d72"
 dependencies = [
  "bamabi_host",
  "bamabi_host_sys",
@@ -511,7 +511,7 @@ dependencies = [
 [[package]]
 name = "bamabi_render"
 version = "0.3.0"
-source = "git+https://github.com/yaga-simha/bamabi.git?branch=main#557989270e93c873aad72b77aeb6aeda385d6a61"
+source = "git+https://github.com/yaga-simha/bamabi.git?branch=main#b7be7addb8ebedfb67fcb6aa9d95e3ec2acb9d72"
 dependencies = [
  "bamabi_host",
  "bamabi_host_sys",
@@ -536,7 +536,7 @@ dependencies = [
 [[package]]
 name = "bamabi_sdk_gen"
 version = "0.3.0"
-source = "git+https://github.com/yaga-simha/bamabi-wire.git?branch=main#7a32b7bd329167c8dda82259659b3da54a5ab748"
+source = "git+https://github.com/yaga-simha/bamabi-wire.git?branch=main#433df66cca7388e4d4bae80c649060261612af57"
 dependencies = [
  "bamabi_sys",
 ]
@@ -544,12 +544,12 @@ dependencies = [
 [[package]]
 name = "bamabi_sys"
 version = "0.3.0"
-source = "git+https://github.com/yaga-simha/bamabi-wire.git?branch=main#7a32b7bd329167c8dda82259659b3da54a5ab748"
+source = "git+https://github.com/yaga-simha/bamabi-wire.git?branch=main#433df66cca7388e4d4bae80c649060261612af57"
 
 [[package]]
 name = "bamabi_trust"
 version = "0.3.0"
-source = "git+https://github.com/yaga-simha/bamabi-tools.git?branch=main#c66399f6c04fc6a10b33ede36140a50018c6a1a4"
+source = "git+https://github.com/yaga-simha/bamabi-tools.git?branch=main#e57356615fb356619c7a5194bc928dddf909cf85"
 dependencies = [
  "ed25519-dalek",
  "sha2",
@@ -1416,7 +1416,7 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-time",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -2948,7 +2948,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e35d6e78f4cebb90e51d543db8fe41528851d6deeef6ef21ebd4bfdc1e784776"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -3790,7 +3790,7 @@ checksum = "3640c1c38b8e4e43584d8df18be5fc6b0aa314ce6ebf51b53313d4306cca8e46"
 dependencies = [
  "hermit-abi",
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -4311,7 +4311,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -5685,7 +5685,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -6208,10 +6208,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.4.3",
+ "getrandom 0.3.4",
  "once_cell",
  "rustix 1.1.6",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -7128,7 +7128,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]

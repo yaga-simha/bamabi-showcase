@@ -201,7 +201,7 @@ Beyond single-query microbenchmarks, `permutation_bench` evaluates a **34-archet
 
 ## 5. ABI `0.3.0` Reload, Migration, Hot-Rewire, Cascade & Soak Gates
 
-Beyond frame-loop microbenchmarks, `v0.3.0` enforces automated performance and allocation invariants across all live ABI `0.3.0` (`68/68`) subsystems:
+Beyond frame-loop microbenchmarks, `v0.3.0` enforces automated performance and allocation invariants across all live ABI `0.3.0` (`73/73`) subsystems:
 
 | Gate / Integration Suite | Workload | Asserted Invariant / Reference Baseline |
 |---|---|---|

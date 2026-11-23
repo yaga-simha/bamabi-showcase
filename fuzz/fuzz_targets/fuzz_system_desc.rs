@@ -208,6 +208,9 @@ fuzz_target!(|data: &[u8]| {
         before_weak_count: 0,
         ambiguous_with: core::ptr::null(),
         ambiguous_with_count: 0,
+        run_if_ctx: None,
+        run_if_query: core::ptr::null(),
+        run_if_ctx_user_data: core::ptr::null_mut(),
     };
 
     if poison_early {

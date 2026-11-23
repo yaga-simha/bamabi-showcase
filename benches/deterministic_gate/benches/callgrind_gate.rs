@@ -261,6 +261,7 @@ pub fn run_dense_1k_gate() {
     let reg = app.world().resource::<ModRegistry>().clone();
     let spec = BamQuerySpecOwned {
         flags: 0,
+        param_set_group: 0,
         terms: vec![
             BamTermDesc::new(pos_h, AccessMode::WRITE),
             BamTermDesc::new(vel_h, AccessMode::READ),
@@ -307,6 +308,7 @@ pub fn run_changed_1pct_gate() {
     let reg = app.world().resource::<ModRegistry>().clone();
     let spec = BamQuerySpecOwned {
         flags: 0,
+        param_set_group: 0,
         terms: vec![BamTermDesc::new(pos_h, AccessMode::CHANGED)],
     };
     app.add_systems(
@@ -350,6 +352,7 @@ pub fn run_command_arena_zero_alloc_gate() {
     let reg = app.world().resource::<ModRegistry>().clone();
     let spec = BamQuerySpecOwned {
         flags: 0,
+        param_set_group: 0,
         terms: vec![BamTermDesc::new(pos_h, AccessMode::FILTER_ONLY)],
     };
     let mut sys = GuestSystem::new(
@@ -397,6 +400,7 @@ pub fn run_sparse_batching_gate() {
     let reg = app.world().resource::<ModRegistry>().clone();
     let spec = BamQuerySpecOwned {
         flags: 0,
+        param_set_group: 0,
         terms: vec![
             BamTermDesc::new(pos_h, AccessMode::WRITE),
             BamTermDesc::new(buff_h, AccessMode::WRITE),

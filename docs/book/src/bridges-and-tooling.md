@@ -21,9 +21,9 @@ Subcommands:
 - **`cargo bam build [--dir <dir>] [--release] [--out-dir <dir>] [--sign-key <key>]`:** Compiles Rust (`cargo`), ISO C99, C++17, or Zig (`zig build`) guests, optionally staging the binary, `mod.toml`, and detached `.sig` sidecar under `<out-dir>`.
 - **`cargo bam pack [--dir <dir>] [--release] [--out <file.bampack>] [--key <key>] [--assets-dir <dir>]`:** Builds (unless `--skip-build`) and emits a deterministic canonical `.bampack` archive containing the shared library, `mod.toml`, and optional scoped `assets/` (rejecting symlinks & traversal), optionally Ed25519-signed for `bamabi_trust`.
 - **`cargo bam watch [--dir <dir>] [--release] [--out-dir <watch_dir>] [--key <key>] [--poll-ms <ms>]`:** Pure-`std` debounced source watcher for Rust, C99, C++17, and Zig guests that incrementally rebuilds, signs, and atomically stages outputs into `--out-dir` for `ModHotReloadPlugin`.
-- **`cargo bam export-sdk --out <dir>`** *(alias: `cargo bam header`)*: Writes `bamabi.h` (C99), `bamabi.hpp` (C++17), and `bamabi.zig` (Zig) with `BAM_EXPORT`, `BAM_RESTRICT`, and all 68 `BAM_HOST_API_OFFSET_*` macros.
+- **`cargo bam export-sdk --out <dir>`** *(alias: `cargo bam header`)*: Writes `bamabi.h` (C99), `bamabi.hpp` (C++17), and `bamabi.zig` (Zig) with `BAM_EXPORT`, `BAM_RESTRICT`, and all 73 `BAM_HOST_API_OFFSET_*` macros.
 - **`cargo bam check-mods <dir>`:** Parses every `mod.toml` under `<dir>`, validates SemVer compatibility against host ABI `0.3.0`, and prints the resolved topological load order (or cycle/version errors).
-- **`cargo bam doctor [--dir <dir>] [--require-c]`:** Probes host ABI `0.3.0` (`68`-slot `BamHostApi`), Rust target triple, MSVC `cl.exe` (`INCLUDE`/`LIB`/`vswhere.exe`), Clang, GCC, Zig (`0.14`–`0.16`), embedded SDK header parity, and optional `mod.toml` DAG health.
+- **`cargo bam doctor [--dir <dir>] [--require-c]`:** Probes host ABI `0.3.0` (`73`-slot `BamHostApi`), Rust target triple, MSVC `cl.exe` (`INCLUDE`/`LIB`/`vswhere.exe`), Clang, GCC, Zig (`0.14`–`0.16`), embedded SDK header parity, and optional `mod.toml` DAG health.
 - **`cargo bam keygen` / `sign` / `verify`:** Generates OpenSSH Ed25519 keypairs, creates detached `SSHSIG` `.sig` sidecars, and verifies loose shared libraries as well as `.bampack` archives directly.
 
 ---
