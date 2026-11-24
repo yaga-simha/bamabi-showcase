@@ -590,10 +590,7 @@ impl StudioEngine {
                 generation: 0,
                 schedule: ScheduleId::UPDATE,
                 mode: ScheduleSetMode::Sequence,
-                before_sets: Vec::new(),
-                after_sets: Vec::new(),
-                before_weak: false,
-                after_weak: false,
+                ..Default::default()
             })
             .map_err(|(code, msg)| format!("configure host chain set ({code}): {msg}"))?;
 
